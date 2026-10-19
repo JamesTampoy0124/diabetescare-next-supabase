@@ -1,0 +1,20 @@
+/* Tailwind theme + utilities for NEW components only. Preflight is deliberately not imported,
+   so it cannot change how the original CSS looks. */
+@layer theme, base, components, utilities;
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+
+/* Reset shared by every original page (style.css, admin.css and dashboard.html all started with it). */
+@layer base {
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+        background: #f4f8f7;
+        color: #263238;
+    }
+}

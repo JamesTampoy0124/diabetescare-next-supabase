@@ -1,0 +1,901 @@
+/* DiabetesCare - admin panel styles (original admin.css + the modal styles that lived inline in admin.html), scoped to .admin-root */
+
+.admin-root {
+    font-family:Arial,Helvetica,sans-serif;
+    background:#f4f8f7;
+    color:#263238;
+}
+
+.admin-root .sidebar {
+    position:fixed;
+    left:0;
+    top:0;
+    width:250px;
+    height:100vh;
+    background:#087f5b;
+    color:white;
+    padding:25px 15px;
+    display:flex;
+    flex-direction:column;
+    z-index:1000;
+}
+
+.admin-root .logo {
+    font-size:21px;
+    font-weight:bold;
+    padding:0 10px 30px;
+}
+
+.admin-root .logo span {
+    display:inline-flex;
+    width:36px;
+    height:36px;
+    background:white;
+    color:#087f5b;
+    border-radius:50%;
+    align-items:center;
+    justify-content:center;
+    margin-right:7px;
+}
+
+.admin-root .admin-label {
+    font-size:10px;
+    opacity:0.65;
+    padding:0 12px;
+    margin-bottom:10px;
+    letter-spacing:1px;
+}
+
+.admin-root nav {
+    display:flex;
+    flex-direction:column;
+    gap:5px;
+}
+
+.admin-root .nav-item {
+    width:100%;
+    display:flex;
+    align-items:center;
+    gap:13px;
+    padding:13px 14px;
+    background:transparent;
+    border:none;
+    color:white;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:14px;
+    text-align:left;
+    transition:0.2s;
+}
+
+.admin-root .nav-item:hover,
+.admin-root .nav-item.active {
+    background:rgba(255,255,255,0.15);
+}
+
+.admin-root .nav-item span {
+    width:20px;
+    text-align:center;
+}
+
+.admin-root .sidebar-bottom {
+    margin-top:auto;
+}
+
+.admin-root .logout-btn {
+    width:100%;
+    border:none;
+    background:rgba(255,255,255,0.1);
+    color:white;
+    padding:13px;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.admin-root .main {
+    margin-left:250px;
+    min-height:100vh;
+}
+
+.admin-root .topbar {
+    height:75px;
+    background:white;
+    border-bottom:1px solid #e7eeee;
+    padding:0 35px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+}
+
+.admin-root .topbar h2 {
+    font-size:20px;
+}
+
+.admin-root .mobile-menu {
+    display:none;
+    border:none;
+    background:none;
+    font-size:22px;
+    cursor:pointer;
+}
+
+.admin-root .admin-profile {
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.admin-root .admin-profile small {
+    display:block;
+    color:#90a4ae;
+    font-size:11px;
+}
+
+.admin-root .avatar {
+    width:40px;
+    height:40px;
+    border-radius:50%;
+    background:#d3f9d8;
+    color:#087f5b;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:bold;
+}
+
+.admin-root .notification {
+    position:relative;
+    margin-right:15px;
+    cursor:pointer;
+}
+
+.admin-root .notification-count {
+    position:absolute;
+    top:-7px;
+    right:-8px;
+    background:#e03131;
+    color:white;
+    font-size:9px;
+    width:16px;
+    height:16px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.admin-root .page {
+    display:none;
+    padding:35px;
+}
+
+.admin-root .active-page {
+    display:block;
+}
+
+.admin-root .page-heading {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:30px;
+}
+
+.admin-root .page-heading h1 {
+    font-size:27px;
+    margin-bottom:5px;
+}
+
+.admin-root .page-heading p {
+    color:#78909c;
+    font-size:14px;
+}
+
+.admin-root .primary-btn {
+    background:#087f5b;
+    color:white;
+    border:none;
+    padding:12px 18px;
+    border-radius:7px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.admin-root .primary-btn:hover {
+    background:#066b4c;
+}
+
+.admin-root .action-btn {
+    border:none;
+    background:#e6fcf5;
+    color:#087f5b;
+    padding:7px 12px;
+    border-radius:5px;
+    cursor:pointer;
+    font-size:12px;
+    font-weight:bold;
+}
+
+.admin-root .stats {
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:20px;
+    margin-bottom:25px;
+}
+
+.admin-root .stat-card {
+    background:white;
+    padding:22px;
+    border-radius:12px;
+    display:flex;
+    align-items:center;
+    gap:15px;
+    box-shadow:0 3px 10px rgba(0,0,0,0.04);
+}
+
+.admin-root .stat-card p {
+    color:#78909c;
+    font-size:13px;
+    margin-bottom:5px;
+}
+
+.admin-root .stat-card h2 {
+    font-size:25px;
+}
+
+.admin-root .stat-card small {
+    color:#90a4ae;
+    font-size:11px;
+}
+
+.admin-root .stat-icon {
+    width:50px;
+    height:50px;
+    border-radius:10px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:21px;
+}
+
+.admin-root .green {
+    background:#e6fcf5;
+    color:#087f5b;
+}
+
+.admin-root .blue {
+    background:#e7f5ff;
+    color:#1971c2;
+}
+
+.admin-root .orange {
+    background:#fff4e6;
+    color:#e8590c;
+}
+
+.admin-root .purple {
+    background:#f3f0ff;
+    color:#6741d9;
+}
+
+.admin-root .dashboard-grid {
+    display:grid;
+    grid-template-columns:1.5fr 1fr;
+    gap:20px;
+}
+
+.admin-root .panel {
+    background:white;
+    border-radius:12px;
+    padding:22px;
+    box-shadow:0 3px 10px rgba(0,0,0,0.04);
+}
+
+.admin-root .panel-header {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:20px;
+}
+
+.admin-root .panel-header h3 {
+    font-size:16px;
+}
+
+.admin-root .panel-header button {
+    border:none;
+    background:none;
+    color:#087f5b;
+    cursor:pointer;
+    font-size:12px;
+    font-weight:bold;
+}
+
+.admin-root .table-wrapper {
+    overflow-x:auto;
+}
+
+.admin-root table {
+    width:100%;
+    border-collapse:collapse;
+    min-width:600px;
+}
+
+.admin-root th {
+    color:#90a4ae;
+    font-size:11px;
+    text-align:left;
+    padding:12px;
+    border-bottom:1px solid #edf2f2;
+}
+
+.admin-root td {
+    padding:14px 12px;
+    font-size:13px;
+    border-bottom:1px solid #edf2f2;
+}
+
+.admin-root .status {
+    display:inline-block;
+    padding:5px 9px;
+    border-radius:20px;
+    font-size:10px;
+    font-weight:bold;
+}
+
+.admin-root .status.active,
+.admin-root .status.confirmed {
+    background:#d3f9d8;
+    color:#2b8a3e;
+}
+
+.admin-root .status.pending {
+    background:#fff3bf;
+    color:#e67700;
+}
+
+.admin-root .appointment-list {
+    display:flex;
+    flex-direction:column;
+    gap:17px;
+}
+
+.admin-root .appointment {
+    display:flex;
+    align-items:center;
+    gap:14px;
+}
+
+.admin-root .appointment p {
+    color:#90a4ae;
+    font-size:12px;
+    margin-top:4px;
+}
+
+.admin-root .date-box {
+    width:45px;
+    height:50px;
+    border-radius:7px;
+    background:#e6fcf5;
+    color:#087f5b;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+}
+
+.admin-root .date-box strong {
+    font-size:17px;
+}
+
+.admin-root .date-box span {
+    font-size:9px;
+}
+
+.admin-root .toolbar {
+    display:flex;
+    gap:10px;
+    margin-bottom:20px;
+}
+
+.admin-root .toolbar input,
+.admin-root .toolbar select {
+    padding:11px 13px;
+    border:1px solid #dce5e5;
+    border-radius:7px;
+    outline:none;
+    font-size:13px;
+}
+
+.admin-root .toolbar input {
+    width:280px;
+}
+
+.admin-root .cards-grid {
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:20px;
+}
+
+.admin-root .doctor-card,
+.admin-root .medication-card,
+.admin-root .report-card {
+    background:white;
+    padding:25px;
+    border-radius:12px;
+    box-shadow:0 3px 10px rgba(0,0,0,0.04);
+}
+
+.admin-root .doctor-avatar {
+    width:55px;
+    height:55px;
+    background:#e6fcf5;
+    color:#087f5b;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:bold;
+    margin-bottom:15px;
+}
+
+.admin-root .doctor-card h3,
+.admin-root .medication-card h3,
+.admin-root .report-card h3 {
+    margin-bottom:6px;
+}
+
+.admin-root .doctor-card p,
+.admin-root .medication-card p,
+.admin-root .report-card p {
+    color:#78909c;
+    font-size:13px;
+    margin-bottom:15px;
+}
+
+.admin-root .medication-card strong {
+    display:block;
+    margin-bottom:12px;
+}
+
+.admin-root .medication-card span {
+    color:#2b8a3e;
+    font-size:11px;
+    font-weight:bold;
+}
+
+.admin-root .report-card button {
+    border:none;
+    background:#087f5b;
+    color:white;
+    padding:9px 13px;
+    border-radius:6px;
+    cursor:pointer;
+}
+
+.admin-root .report-grid {
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:20px;
+}
+
+.admin-root .notification-panel {
+    max-width:850px;
+}
+
+.admin-root .system-notification {
+    padding:18px 0;
+    border-bottom:1px solid #edf2f2;
+}
+
+.admin-root .system-notification:last-child {
+    border-bottom:none;
+}
+
+.admin-root .system-notification p {
+    color:#78909c;
+    font-size:13px;
+    margin:5px 0;
+}
+
+.admin-root .system-notification small {
+    color:#90a4ae;
+    font-size:11px;
+}
+
+.admin-root .settings-panel {
+    max-width:850px;
+}
+
+.admin-root .settings-panel h3 {
+    margin-bottom:15px;
+}
+
+.admin-root .setting-row {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:18px 0;
+    border-bottom:1px solid #edf2f2;
+}
+
+.admin-root .setting-row p {
+    color:#90a4ae;
+    font-size:12px;
+    margin-top:4px;
+}
+
+.admin-root .settings-title {
+    margin-top:30px;
+}
+
+.admin-root .switch {
+    position:relative;
+    width:42px;
+    height:23px;
+}
+
+.admin-root .switch input {
+    opacity:0;
+    width:0;
+    height:0;
+}
+
+.admin-root .switch span {
+    position:absolute;
+    inset:0;
+    background:#ccc;
+    border-radius:20px;
+    cursor:pointer;
+}
+
+.admin-root .switch span::before {
+    content:"";
+    position:absolute;
+    width:17px;
+    height:17px;
+    left:3px;
+    top:3px;
+    background:white;
+    border-radius:50%;
+    transition:0.2s;
+}
+
+.admin-root .switch input:checked + span {
+    background:#087f5b;
+}
+
+.admin-root .switch input:checked + span::before {
+    transform:translateX(19px);
+}
+
+@media (max-width:1100px) {
+    .admin-root .stats {
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .admin-root .dashboard-grid {
+        grid-template-columns:1fr;
+    }
+
+    .admin-root .cards-grid,
+    .admin-root .report-grid {
+        grid-template-columns:repeat(2,1fr);
+    }
+
+}
+@media (max-width:750px) {
+    .admin-root .sidebar {
+        transform:translateX(-100%);
+        transition:0.3s;
+    }
+
+    .admin-root .sidebar.open {
+        transform:translateX(0);
+    }
+
+    .admin-root .main {
+        margin-left:0;
+    }
+
+    .admin-root .mobile-menu {
+        display:inline-block;
+        margin-right:12px;
+    }
+
+    .admin-root .topbar {
+        padding:0 20px;
+    }
+
+    .admin-root .page {
+        padding:25px 20px;
+    }
+
+    .admin-root .page-heading {
+        align-items:flex-start;
+        gap:15px;
+        flex-direction:column;
+    }
+
+    .admin-root .cards-grid,
+    .admin-root .report-grid {
+        grid-template-columns:1fr;
+    }
+
+}
+@media (max-width:500px) {
+    .admin-root .stats {
+        grid-template-columns:1fr;
+    }
+
+    .admin-root .admin-profile > div:last-child {
+        display:none;
+    }
+
+    .admin-root .toolbar {
+        flex-direction:column;
+    }
+
+    .admin-root .toolbar input {
+        width:100%;
+    }
+
+}
+.admin-root .modal {
+    border:none;
+    border-radius:12px;
+    padding:0;
+    width:min(460px,92vw);
+    box-shadow:0 20px 50px rgba(0,0,0,0.25);
+    margin: auto;
+    max-height: 95vh;
+    overflow-y: auto;
+}
+
+.admin-root .modal::backdrop {
+    background:rgba(0,0,0,0.4);
+}
+
+.admin-root .modal form {
+    padding:24px;
+}
+
+.admin-root .modal h3 {
+    margin-bottom:18px;
+}
+
+.admin-root .field {
+    margin-bottom:14px;
+}
+
+.admin-root .field label {
+    display:block;
+    font-size:12px;
+    font-weight:bold;
+    color:#455a64;
+    margin-bottom:6px;
+}
+
+.admin-root .field input,
+.admin-root .field select {
+    width:100%;
+    padding:11px 12px;
+    border:1px solid #cfd8dc;
+    border-radius:7px;
+    font-size:14px;
+    background:white;
+}
+
+.admin-root .field input[readonly] {
+    background:#f1f3f5;
+    color:#78909c;
+}
+
+.admin-root .field small {
+    display:block;
+    color:#90a4ae;
+    font-size:11px;
+    margin-top:4px;
+}
+
+.admin-root .modal-error {
+    color:#c92a2a;
+    font-size:13px;
+    min-height:18px;
+    margin-bottom:8px;
+}
+
+.admin-root .modal-actions {
+    display:flex;
+    justify-content:flex-end;
+    gap:10px;
+}
+
+.admin-root .secondary-btn {
+    background:#f1f3f5;
+    color:#495057;
+    border:none;
+    padding:12px 18px;
+    border-radius:7px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.admin-root .detail-row {
+    display:flex;
+    justify-content:space-between;
+    gap:20px;
+    padding:9px 0;
+    border-bottom:1px solid #edf2f2;
+    font-size:14px;
+}
+
+.admin-root .detail-row span:first-child {
+    color:#78909c;
+}
+
+.admin-root .status.inactive {
+    background:#ffe3e3;
+    color:#c92a2a;
+}
+
+.admin-root .warning-box {
+    background:#fff3bf;
+    color:#7c5e00;
+    border-radius:8px;
+    padding:12px 16px;
+    margin-bottom:20px;
+    font-size:13px;
+    line-height:1.5;
+}
+
+.admin-root .doctor-card small {
+    color:#90a4ae;
+    font-size:12px;
+}
+
+
+/* ---- Added for the Next.js conversion (links replace buttons, extra statuses, pagination) ---- */
+.admin-root a.nav-item {
+    text-decoration: none;
+}
+
+.admin-root a.primary-btn {
+    display: inline-block;
+    text-decoration: none;
+}
+
+.admin-root .panel-header a {
+    color: #087f5b;
+    font-size: 12px;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.admin-root a.notification {
+    color: inherit;
+    text-decoration: none;
+}
+
+.admin-root .status.completed {
+    background: #e7f5ff;
+    color: #1971c2;
+}
+
+.admin-root .status.cancelled {
+    background: #ffe3e3;
+    color: #c92a2a;
+}
+
+.admin-root .primary-btn:disabled,
+.admin-root .action-btn:disabled,
+.admin-root .secondary-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.admin-root .empty-row {
+    color: #90a4ae;
+    text-align: center;
+}
+
+.admin-root .pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 18px;
+    font-size: 12px;
+    color: #78909c;
+}
+
+.admin-root .pagination div {
+    display: flex;
+    gap: 8px;
+}
+
+.admin-root .header-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.admin-root .field textarea {
+    width: 100%;
+    padding: 11px 12px;
+    border: 1px solid #cfd8dc;
+    border-radius: 7px;
+    font-size: 14px;
+    background: white;
+    font-family: inherit;
+}
+
+.admin-root a.action-btn {
+    display: inline-block;
+    text-decoration: none;
+}
+
+.admin-root .empty-state {
+    color: #90a4ae;
+    font-size: 13px;
+    padding: 18px 0;
+}
+
+.admin-root .card-actions {
+    margin-top: 14px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.admin-root .toolbar select {
+    background: white;
+}
+
+.admin-root .page-message {
+    margin-bottom: 20px;
+}
+
+.admin-root .setting-row .action-btn + .action-btn {
+    margin-left: 8px;
+}
+
+.admin-root .system-notification.unread strong::after {
+    content: " \2022";
+    color: #e03131;
+}
+
+.admin-root .loading-box {
+    padding: 35px;
+    color: #78909c;
+}
+
+.admin-root .error-box {
+    padding: 35px;
+}
+
+.admin-root .error-box h2 {
+    margin-bottom: 8px;
+}
+
+.admin-root .error-box p {
+    color: #78909c;
+    margin-bottom: 16px;
+    font-size: 14px;
+}
+
+.admin-root .form-message {
+    font-size: 13px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+}
+
+.admin-root .form-message.success {
+    background: #d3f9d8;
+    color: #2b8a3e;
+}
+
+.admin-root .form-message.error {
+    background: #ffe3e3;
+    color: #c92a2a;
+}
