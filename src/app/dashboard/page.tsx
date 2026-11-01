@@ -1,32 +1,23 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import "@/styles/dashboard.css";
+import { redirect } from "next/navigation";
+import { DashboardHeader } from "@/components/layout/DashboardHeader";
 import { IdleTimeout } from "@/components/layout/IdleTimeout";
-import { LogoutButton } from "@/components/layout/LogoutButton";
 import { requireProfile } from "@/lib/auth";
 import { ROLES } from "@/lib/roles";
 
 export const metadata: Metadata = { title: "DiabetesCare Dashboard" };
 
-// All logged-in roles may open this page.
+// Dashboard for front desk (admins can open it too). Patients use /patient; doctors and nurses use /admin.
 export default async function DashboardPage() {
   const profile = await requireProfile();
 
+  if (profile.role === "patient") redirect("/patient");
+  // Doctors and nurses work in the admin panel (without Staff management)
+  if (profile.role === "doctor" || profile.role === "nurse") redirect("/admin");
+
   return (
     <div className="dash-root">
-      <header>
-        <h2>♥ DiabetesCare</h2>
-
-        <div>
-          {profile.role === "admin" && (
-            <Link href="/admin" style={{ color: "white", marginRight: 16, fontWeight: "bold" }}>
-              Admin Panel
-            </Link>
-          )}
-
-          <LogoutButton className="logout">Log Out</LogoutButton>
-        </div>
-      </header>
+      <DashboardHeader role={profile.role} />
 
       <main>
         <div className="welcome">

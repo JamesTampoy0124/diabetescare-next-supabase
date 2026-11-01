@@ -2,7 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { getAdminOrNull } from "@/lib/auth";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { getActiveProfile, getAdminOrNull } from "@/lib/auth";
+import { PANEL_ROLES } from "@/lib/roles";
 import { getOrigin } from "@/lib/origin";
 import { firstError, str } from "@/lib/utils/form";
 import { changePasswordSchema } from "@/lib/validations/auth";
@@ -12,15 +14,15 @@ import type { ActionState } from "@/types/actions";
 const NOT_ALLOWED: ActionState = { error: "You do not have permission to do this." };
 
 export async function updateOwnName(formData: FormData): Promise<ActionState> {
-  const me = await getAdminOrNull();
+  const me = await getActiveProfile(PANEL_ROLES);
   if (!me) return NOT_ALLOWED;
 
   const name = str(formData, "name").trim();
   if (name.length < 2) return { error: "Please enter your full name." };
   if (name.length > 80) return { error: "Name is too long." };
 
-  const supabase = await createClient();
-  const { error } = await supabase.from("profiles").update({ full_name: name }).eq("id", me.id);
+  // Only the caller's own row, and only the name (RLS lets just the administrator edit profiles directly)
+  const { error } = await createAdminClient().from("profiles").update({ full_name: name }).eq("id", me.id);
   if (error) return { error: "Something went wrong. Please try again." };
 
   revalidatePath("/admin", "layout");
@@ -28,7 +30,7 @@ export async function updateOwnName(formData: FormData): Promise<ActionState> {
 }
 
 export async function updateOwnEmail(formData: FormData): Promise<ActionState> {
-  if (!(await getAdminOrNull())) return NOT_ALLOWED;
+  if (!(await getActiveProfile(PANEL_ROLES))) return NOT_ALLOWED;
 
   const email = emailField.safeParse(str(formData, "email"));
   if (!email.success) return { error: firstError(email.error) };
@@ -49,7 +51,7 @@ export async function updateOwnEmail(formData: FormData): Promise<ActionState> {
 }
 
 export async function changeOwnPassword(formData: FormData): Promise<ActionState> {
-  const me = await getAdminOrNull();
+  const me = await getActiveProfile(PANEL_ROLES);
   if (!me) return NOT_ALLOWED;
 
   const parsed = changePasswordSchema.safeParse({

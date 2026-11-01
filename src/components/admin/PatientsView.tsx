@@ -2,7 +2,13 @@
 
 import { useRef, useState, useTransition } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { createPatient, setPatientArchived, updatePatient } from "@/actions/patients";
+import {
+  createLoginForPatient,
+  createPatient,
+  resetPatientPassword,
+  setPatientArchived,
+  updatePatient,
+} from "@/actions/patients";
 import { DetailRow, Field } from "@/components/ui/Fields";
 import { ModalForm } from "@/components/ui/Modal";
 import { Pagination } from "@/components/ui/Pagination";
@@ -28,7 +34,7 @@ export interface PatientRow {
   registered: string;
 }
 
-type ModalState = null | { mode: "add" } | { mode: "view" | "edit"; patient: PatientRow };
+type ModalState = null | { mode: "add" } | { mode: "view" | "edit" | "login" | "reset"; patient: PatientRow };
 
 interface PatientsViewProps {
   rows: PatientRow[];
@@ -38,6 +44,10 @@ interface PatientsViewProps {
   q: string;
   status: string;
   today: string;
+  /** Archiving a patient also switches their login off, so only the administrator may do it. */
+  canArchive: boolean;
+  /** Only the administrator may set a new password for a patient. */
+  canResetPassword: boolean;
 }
 
 function PatientFields({ patient, today }: { patient?: PatientRow; today: string }) {
@@ -133,6 +143,7 @@ function PatientFields({ patient, today }: { patient?: PatientRow; today: string
 
 function AddPatientModal({ today, onClose }: { today: string; onClose: () => void }) {
   const { state, pending, submit } = useFormSubmit(createPatient);
+  const [withLogin, setWithLogin] = useState(false);
 
   return (
     <ModalForm
@@ -144,6 +155,82 @@ function AddPatientModal({ today, onClose }: { today: string; onClose: () => voi
       pending={pending}
     >
       <PatientFields today={today} />
+
+      <label style={{ display: "flex", gap: 8, alignItems: "center", fontSize: 13, margin: "6px 0 12px" }}>
+        <input type="checkbox" name="createLogin" checked={withLogin} onChange={(e) => setWithLogin(e.target.checked)} />
+        Create a login so the patient can use the patient portal
+      </label>
+
+      {withLogin && (
+        <Field
+          label="Temporary password"
+          name="password"
+          type="text"
+          required
+          minLength={8}
+          autoComplete="off"
+          hint="The patient logs in with the email above and this password. Give it to them privately; they can reset it with Forgot Password."
+        />
+      )}
+    </ModalForm>
+  );
+}
+
+function CreateLoginModal({ patient, onClose }: { patient: PatientRow; onClose: () => void }) {
+  const { state, pending, submit } = useFormSubmit(createLoginForPatient);
+
+  return (
+    <ModalForm
+      title={`Create login for ${patient.name}`}
+      submitLabel="Create Login"
+      onClose={onClose}
+      onSubmit={(e) => submit(e, onClose)}
+      error={state?.error}
+      pending={pending}
+    >
+      <input type="hidden" name="id" value={patient.id} />
+      <DetailRow label="Email (the login)" value={patient.email} />
+      <Field
+        label="Temporary password"
+        name="password"
+        type="text"
+        required
+        minLength={8}
+        autoComplete="off"
+        hint="At least 8 characters. Give it to the patient privately; they can reset it with Forgot Password."
+      />
+    </ModalForm>
+  );
+}
+
+function ResetPatientPasswordModal({ patient, onClose }: { patient: PatientRow; onClose: () => void }) {
+  const { state, pending, submit } = useFormSubmit(resetPatientPassword);
+
+  return (
+    <ModalForm
+      title={`Reset password for ${patient.name}`}
+      submitLabel="Reset Password"
+      onClose={onClose}
+      onSubmit={(e) =>
+        submit(e, () => {
+          window.alert(`Password reset for ${patient.name}. Give the new password to the patient privately.`);
+          onClose();
+        })
+      }
+      error={state?.error}
+      pending={pending}
+    >
+      <input type="hidden" name="id" value={patient.id} />
+      <DetailRow label="Login (email)" value={patient.email} />
+      <Field
+        label="New temporary password"
+        name="password"
+        type="text"
+        required
+        minLength={8}
+        autoComplete="off"
+        hint="At least 8 characters. Give it to the patient privately."
+      />
     </ModalForm>
   );
 }
@@ -166,7 +253,7 @@ function EditPatientModal({ patient, today, onClose }: { patient: PatientRow; to
   );
 }
 
-export function PatientsView({ rows, total, page, pageSize, q, status, today }: PatientsViewProps) {
+export function PatientsView({ rows, total, page, pageSize, q, status, today, canArchive, canResetPassword }: PatientsViewProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [modal, setModal] = useState<ModalState>(null);
@@ -291,10 +378,23 @@ export function PatientsView({ rows, total, page, pageSize, q, status, today }: 
                       </button>{" "}
                       <button type="button" className="action-btn" onClick={() => setModal({ mode: "edit", patient: p })}>
                         Edit
-                      </button>{" "}
-                      <button type="button" className="action-btn" onClick={() => toggleArchive(p)}>
-                        {p.status === "Active" ? "Archive" : "Restore"}
                       </button>
+                      {!p.hasLogin && p.email && p.status === "Active" && (
+                        <>
+                          {" "}
+                          <button type="button" className="action-btn" onClick={() => setModal({ mode: "login", patient: p })}>
+                            Create login
+                          </button>
+                        </>
+                      )}
+                      {canArchive && (
+                        <>
+                          {" "}
+                          <button type="button" className="action-btn" onClick={() => toggleArchive(p)}>
+                            {p.status === "Active" ? "Archive" : "Restore"}
+                          </button>
+                        </>
+                      )}
                     </td>
                   </tr>
                 ))
@@ -308,6 +408,8 @@ export function PatientsView({ rows, total, page, pageSize, q, status, today }: 
 
       {modal?.mode === "add" && <AddPatientModal today={today} onClose={close} />}
       {modal?.mode === "edit" && <EditPatientModal patient={modal.patient} today={today} onClose={close} />}
+      {modal?.mode === "login" && <CreateLoginModal patient={modal.patient} onClose={close} />}
+      {modal?.mode === "reset" && <ResetPatientPasswordModal patient={modal.patient} onClose={close} />}
       {modal?.mode === "view" && (
         <ModalForm title={`Patient ${modal.patient.code}`} onClose={close}>
           <DetailRow label="Name" value={modal.patient.name} />
@@ -324,6 +426,13 @@ export function PatientsView({ rows, total, page, pageSize, q, status, today }: 
           <DetailRow label="PhilHealth number" value={modal.patient.philhealth ? formatPhilhealth(modal.patient.philhealth) : "-"} />
           <DetailRow label="Status" value={modal.patient.status} />
           <DetailRow label="Patient login" value={modal.patient.hasLogin ? "Yes" : "No"} />
+          {canResetPassword && modal.patient.hasLogin && (
+            <p style={{ margin: "10px 0 4px" }}>
+              <button type="button" className="action-btn" onClick={() => setModal({ mode: "reset", patient: modal.patient })}>
+                Reset password
+              </button>
+            </p>
+          )}
           <DetailRow label="Added" value={modal.patient.addedBy} />
           <DetailRow label="Registered" value={modal.patient.registered} />
         </ModalForm>

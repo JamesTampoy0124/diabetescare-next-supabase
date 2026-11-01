@@ -2,6 +2,7 @@ import "server-only";
 import { cache } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { ROLE_HOME } from "@/lib/roles";
 import type { Profile, UserRole } from "@/types/database";
 
 const PROFILE_COLUMNS = "id, email, full_name, role, specialty, phone, birth_date, active, created_at";
@@ -48,7 +49,7 @@ export async function requireProfile(allowed?: UserRole[]): Promise<Profile> {
   // because the middleware sends anyone who still has a login cookie back to "/".)
   if (!profile) redirect("/auth/signout?reason=required");
   if (!profile.active) redirect("/auth/signout?reason=inactive");
-  if (allowed && !allowed.includes(profile.role)) redirect("/dashboard");
+  if (allowed && !allowed.includes(profile.role)) redirect(ROLE_HOME[profile.role] ?? "/dashboard");
 
   return profile;
 }
@@ -57,4 +58,10 @@ export async function requireProfile(allowed?: UserRole[]): Promise<Profile> {
 export async function getAdminOrNull(): Promise<Profile | null> {
   const profile = await getCurrentProfile();
   return profile && profile.active && profile.role === "admin" ? profile : null;
+}
+
+/** The active logged-in user if their role is one of `roles`, otherwise null (for Server Actions). */
+export async function getActiveProfile(roles: UserRole[]): Promise<Profile | null> {
+  const profile = await getCurrentProfile();
+  return profile && profile.active && roles.includes(profile.role) ? profile : null;
 }

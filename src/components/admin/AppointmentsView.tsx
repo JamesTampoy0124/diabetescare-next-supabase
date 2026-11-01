@@ -18,6 +18,9 @@ export interface AppointmentRow {
   status: AppointmentStatus;
   statusLabel: string;
   notes: string;
+  meetingLink: string;
+  /** Set for a doctor's confirmed appointments that have a meeting link: opens the video call. */
+  joinHref?: string;
 }
 
 interface Option {
@@ -33,6 +36,10 @@ interface AppointmentsViewProps {
   page: number;
   pageSize: number;
   total: number;
+  /** Page address, used by the Previous / Next links. */
+  basePath?: string;
+  /** False = view only (nurses): no "New Appointment" button and no status changes. */
+  canManage?: boolean;
 }
 
 function NewAppointmentModal({
@@ -63,11 +70,27 @@ function NewAppointmentModal({
       <Field label="Date" name="date" type="date" required min={today} defaultValue={today} />
       <Field label="Time" name="time" type="time" required defaultValue="09:00" />
       <Field label="Notes (optional)" name="notes" type="text" maxLength={500} />
+      <Field
+        label="Video meeting link (optional)"
+        name="meetingLink"
+        type="url"
+        maxLength={500}
+        placeholder="https://zoom.us/j/..."
+        hint="Paste a Zoom, Google Meet or Teams link. The patient can join from it once the appointment is confirmed."
+      />
     </ModalForm>
   );
 }
 
-function AppointmentDetailsModal({ appointment, onClose }: { appointment: AppointmentRow; onClose: () => void }) {
+function AppointmentDetailsModal({
+  appointment,
+  onClose,
+  readOnly,
+}: {
+  appointment: AppointmentRow;
+  onClose: () => void;
+  readOnly: boolean;
+}) {
   const { state, pending, submit } = useFormSubmit(updateAppointmentStatus);
 
   return (
@@ -75,7 +98,7 @@ function AppointmentDetailsModal({ appointment, onClose }: { appointment: Appoin
       title="Appointment"
       submitLabel="Update Status"
       onClose={onClose}
-      onSubmit={(e) => submit(e, onClose)}
+      onSubmit={readOnly ? undefined : (e) => submit(e, onClose)}
       error={state?.error}
       pending={pending}
     >
@@ -85,7 +108,20 @@ function AppointmentDetailsModal({ appointment, onClose }: { appointment: Appoin
       <DetailRow label="Date" value={appointment.dateLabel} />
       <DetailRow label="Time" value={appointment.timeLabel} />
       <DetailRow label="Notes" value={appointment.notes || "-"} />
+      {readOnly && <DetailRow label="Video meeting" value={appointment.meetingLink ? "Link added" : "-"} />}
+      {readOnly ? (
+        <DetailRow label="Status" value={appointment.statusLabel} />
+      ) : (
       <div style={{ marginTop: 14 }}>
+        <Field
+          label="Video meeting link"
+          name="meetingLink"
+          type="url"
+          defaultValue={appointment.meetingLink}
+          maxLength={500}
+          placeholder="https://zoom.us/j/..."
+          hint="Leave empty for an in-person appointment."
+        />
         <SelectField
           label="Status"
           name="status"
@@ -98,13 +134,24 @@ function AppointmentDetailsModal({ appointment, onClose }: { appointment: Appoin
           ]}
         />
       </div>
+      )}
     </ModalForm>
   );
 }
 
 type ModalState = null | { mode: "new" } | { mode: "view"; appointment: AppointmentRow };
 
-export function AppointmentsView({ rows, patients, doctors, today, page, pageSize, total }: AppointmentsViewProps) {
+export function AppointmentsView({
+  rows,
+  patients,
+  doctors,
+  today,
+  page,
+  pageSize,
+  total,
+  basePath = "/admin/appointments",
+  canManage = true,
+}: AppointmentsViewProps) {
   const [modal, setModal] = useState<ModalState>(null);
   const close = () => setModal(null);
 
@@ -116,9 +163,11 @@ export function AppointmentsView({ rows, patients, doctors, today, page, pageSiz
           <p>Manage patient appointments.</p>
         </div>
 
-        <button type="button" className="primary-btn" onClick={() => setModal({ mode: "new" })}>
-          + New Appointment
-        </button>
+        {canManage && (
+          <button type="button" className="primary-btn" onClick={() => setModal({ mode: "new" })}>
+            + New Appointment
+          </button>
+        )}
       </div>
 
       <div className="panel">
@@ -154,6 +203,14 @@ export function AppointmentsView({ rows, patients, doctors, today, page, pageSiz
                       <button type="button" className="action-btn" onClick={() => setModal({ mode: "view", appointment: a })}>
                         View
                       </button>
+                      {a.joinHref && (
+                        <>
+                          {" "}
+                          <a className="action-btn" href={a.joinHref} target="_blank" rel="noopener noreferrer">
+                            Join video call
+                          </a>
+                        </>
+                      )}
                     </td>
                   </tr>
                 ))
@@ -162,13 +219,15 @@ export function AppointmentsView({ rows, patients, doctors, today, page, pageSiz
           </table>
         </div>
 
-        <Pagination basePath="/admin/appointments" page={page} pageSize={pageSize} total={total} />
+        <Pagination basePath={basePath} page={page} pageSize={pageSize} total={total} />
       </div>
 
       {modal?.mode === "new" && (
         <NewAppointmentModal patients={patients} doctors={doctors} today={today} onClose={close} />
       )}
-      {modal?.mode === "view" && <AppointmentDetailsModal appointment={modal.appointment} onClose={close} />}
+      {modal?.mode === "view" && (
+        <AppointmentDetailsModal appointment={modal.appointment} onClose={close} readOnly={!canManage} />
+      )}
     </section>
   );
 }

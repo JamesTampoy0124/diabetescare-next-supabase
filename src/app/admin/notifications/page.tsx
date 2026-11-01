@@ -1,11 +1,13 @@
 import { MarkAllReadButton } from "@/components/admin/MarkAllReadButton";
 import { requireProfile } from "@/lib/auth";
+import { PANEL_ROLES } from "@/lib/roles";
+
 import { createClient } from "@/lib/supabase/server";
 import { timeAgo } from "@/lib/utils/format";
 import type { AppNotification } from "@/types/database";
 
 export default async function NotificationsPage() {
-  await requireProfile(["admin"]);
+  const me = await requireProfile(PANEL_ROLES);
 
   const supabase = await createClient();
   const { data } = await supabase
@@ -25,7 +27,7 @@ export default async function NotificationsPage() {
           <p>System alerts and notifications.</p>
         </div>
 
-        <MarkAllReadButton disabled={!hasUnread} />
+        {me.role === "admin" && <MarkAllReadButton disabled={!hasUnread} />}
       </div>
 
       <div className="panel notification-panel">

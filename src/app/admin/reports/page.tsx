@@ -1,11 +1,13 @@
 import { ReportsView, type ReportItem } from "@/components/admin/ReportsView";
 import { requireProfile } from "@/lib/auth";
+import { PANEL_ROLES } from "@/lib/roles";
+
 import { createClient } from "@/lib/supabase/server";
 import { formatDateTime } from "@/lib/utils/format";
 import type { Report } from "@/types/database";
 
 export default async function ReportsPage() {
-  await requireProfile(["admin"]);
+  await requireProfile(PANEL_ROLES);
 
   const supabase = await createClient();
   const { data } = await supabase

@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { getAdminOrNull } from "@/lib/auth";
+import { getCurrentProfile } from "@/lib/auth";
 import { firstError, str } from "@/lib/utils/form";
 import { todayInClinicTz } from "@/lib/utils/format";
 import { appointmentSchema, appointmentStatusSchema } from "@/lib/validations/records";
@@ -10,12 +10,21 @@ import type { ActionState } from "@/types/actions";
 
 const NOT_ALLOWED: ActionState = { error: "You do not have permission to do this." };
 
+/** Admins manage every appointment; doctors manage their own. Nurses, front desk and patients can only view. */
+async function getScheduler() {
+  const profile = await getCurrentProfile();
+  if (!profile || !profile.active) return null;
+  return profile.role === "admin" || profile.role === "doctor" ? profile : null;
+}
+
 function refresh() {
   revalidatePath("/admin", "layout");
+  revalidatePath("/dashboard", "layout");
+  revalidatePath("/patient");
 }
 
 export async function createAppointment(formData: FormData): Promise<ActionState> {
-  const me = await getAdminOrNull();
+  const me = await getScheduler();
   if (!me) return NOT_ALLOWED;
 
   const parsed = appointmentSchema.safeParse({
@@ -24,10 +33,15 @@ export async function createAppointment(formData: FormData): Promise<ActionState
     date: str(formData, "date"),
     time: str(formData, "time"),
     notes: str(formData, "notes"),
+    meetingLink: str(formData, "meetingLink"),
   });
   if (!parsed.success) return { error: firstError(parsed.error) };
 
-  const { patientId, doctorId, date, time, notes } = parsed.data;
+  const { patientId, doctorId, date, time, notes, meetingLink } = parsed.data;
+
+  if (me.role === "doctor" && doctorId !== me.id) {
+    return { error: "Doctors can only create appointments for themselves." };
+  }
 
   if (date < todayInClinicTz()) return { error: "Choose today or a later date." };
 
@@ -47,6 +61,7 @@ export async function createAppointment(formData: FormData): Promise<ActionState
     appointment_date: date,
     appointment_time: time,
     notes,
+    meeting_link: meetingLink,
     status: "pending",
     created_by: me.id,
   });
@@ -58,13 +73,34 @@ export async function createAppointment(formData: FormData): Promise<ActionState
 }
 
 export async function updateAppointmentStatus(formData: FormData): Promise<ActionState> {
-  if (!(await getAdminOrNull())) return NOT_ALLOWED;
+  const me = await getScheduler();
+  if (!me) return NOT_ALLOWED;
 
-  const parsed = appointmentStatusSchema.safeParse({ id: str(formData, "id"), status: str(formData, "status") });
+  const parsed = appointmentStatusSchema.safeParse({
+    id: str(formData, "id"),
+    status: str(formData, "status"),
+    // only present when the form has the meeting link box
+    meetingLink: formData.has("meetingLink") ? str(formData, "meetingLink") : undefined,
+  });
   if (!parsed.success) return { error: firstError(parsed.error) };
 
   const supabase = await createClient();
-  const { error } = await supabase.from("appointments").update({ status: parsed.data.status }).eq("id", parsed.data.id);
+
+  // A doctor may only change their own appointments (the database enforces this too)
+  if (me.role === "doctor") {
+    const { data: own } = await supabase
+      .from("appointments")
+      .select("id")
+      .eq("id", parsed.data.id)
+      .eq("doctor_id", me.id)
+      .maybeSingle();
+    if (!own) return NOT_ALLOWED;
+  }
+
+  const changes: { status: string; meeting_link?: string } = { status: parsed.data.status };
+  if (parsed.data.meetingLink !== undefined) changes.meeting_link = parsed.data.meetingLink;
+
+  const { error } = await supabase.from("appointments").update(changes).eq("id", parsed.data.id);
 
   if (error) return { error: "Something went wrong. Please try again." };
 

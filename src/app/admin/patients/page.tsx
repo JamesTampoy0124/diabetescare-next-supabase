@@ -1,5 +1,7 @@
 import { PatientsView, type PatientRow } from "@/components/admin/PatientsView";
 import { requireProfile } from "@/lib/auth";
+import { PANEL_ROLES } from "@/lib/roles";
+
 import { createClient } from "@/lib/supabase/server";
 import { formatDate, patientCode, todayInClinicTz } from "@/lib/utils/format";
 import type { Patient } from "@/types/database";
@@ -11,7 +13,7 @@ export default async function PatientsPage({
 }: {
   searchParams: Promise<{ q?: string; status?: string; page?: string }>;
 }) {
-  await requireProfile(["admin"]);
+  const me = await requireProfile(PANEL_ROLES);
 
   const { q = "", status = "", page: pageParam } = await searchParams;
   const page = Math.max(1, parseInt(pageParam ?? "1", 10) || 1);
@@ -69,6 +71,8 @@ export default async function PatientsPage({
       q={q}
       status={status}
       today={todayInClinicTz()}
+      canArchive={me.role === "admin"}
+      canResetPassword={me.role === "admin"}
     />
   );
 }

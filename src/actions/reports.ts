@@ -2,7 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { getAdminOrNull } from "@/lib/auth";
+import { getActiveProfile } from "@/lib/auth";
+import { PANEL_ROLES } from "@/lib/roles";
 import { todayInClinicTz } from "@/lib/utils/format";
 import type { ActionState } from "@/types/actions";
 import type { Report, ReportType } from "@/types/database";
@@ -15,7 +16,7 @@ const TYPES: ReportType[] = ["patient", "glucose", "appointment"];
 
 /** Calculates the report inside the database (public.generate_report) and stores it. */
 export async function generateReport(type: string): Promise<ReportActionState> {
-  if (!(await getAdminOrNull())) return { error: "You do not have permission to do this." };
+  if (!(await getActiveProfile(PANEL_ROLES))) return { error: "You do not have permission to do this." };
   if (!TYPES.includes(type as ReportType)) return { error: "Choose a report type." };
 
   const supabase = await createClient();

@@ -26,7 +26,7 @@ function AddMedicationModal({ onClose }: { onClose: () => void }) {
   );
 }
 
-export function MedicationsView({ medications }: { medications: Medication[] }) {
+export function MedicationsView({ medications, canAdd }: { medications: Medication[]; canAdd: boolean }) {
   const [adding, setAdding] = useState(false);
 
   return (
@@ -37,9 +37,11 @@ export function MedicationsView({ medications }: { medications: Medication[] }) 
           <p>Monitor medications registered in the system.</p>
         </div>
 
-        <button type="button" className="primary-btn" onClick={() => setAdding(true)}>
-          + Add Medication
-        </button>
+        {canAdd && (
+          <button type="button" className="primary-btn" onClick={() => setAdding(true)}>
+            + Add Medication
+          </button>
+        )}
       </div>
 
       <div className="cards-grid">

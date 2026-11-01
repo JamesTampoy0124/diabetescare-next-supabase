@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { STAFF_ROLES } from "@/lib/roles";
+import { meetingLinkField } from "./meeting";
 import { birthDateField, dateField, emailField, passwordField, phoneField, uuidField } from "./common";
 
 const bloodPressureField = z
@@ -54,6 +55,7 @@ export const appointmentSchema = z.object({
   date: dateField,
   time: z.string().regex(/^\d{2}:\d{2}$/, "Choose a time."),
   notes: z.string().trim().max(500, "Notes are too long (500 characters maximum)."),
+  meetingLink: meetingLinkField,
 });
 
 export const appointmentStatusSchema = z.object({
@@ -61,6 +63,7 @@ export const appointmentStatusSchema = z.object({
   status: z.enum(["pending", "confirmed", "completed", "cancelled"], {
     errorMap: () => ({ message: "Choose a status." }),
   }),
+  meetingLink: meetingLinkField.optional(),
 });
 
 export const medicationSchema = z.object({

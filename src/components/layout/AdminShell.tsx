@@ -3,20 +3,24 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { ROLES } from "@/lib/roles";
+import type { UserRole } from "@/types/database";
 import { LogoutButton } from "./LogoutButton";
 
-const NAV = [
+const NAV: { href: string; icon: string; label: string; roles?: UserRole[] }[] = [
   { href: "/admin", icon: "▦", label: "Dashboard" },
   { href: "/admin/patients", icon: "♟", label: "Patients" },
-  { href: "/admin/staff", icon: "⚕", label: "Staff" },
+  { href: "/admin/staff", icon: "⚕", label: "Staff", roles: ["admin"] },
   { href: "/admin/appointments", icon: "▣", label: "Appointments" },
   { href: "/admin/medications", icon: "▤", label: "Medications" },
+  { href: "/admin/glucose", icon: "◐", label: "Glucose", roles: ["doctor", "nurse"] },
   { href: "/admin/reports", icon: "▥", label: "Reports" },
   { href: "/admin/notifications", icon: "🔔", label: "Notifications" },
   { href: "/admin/settings", icon: "⚙", label: "Settings" },
 ];
 
 interface AdminShellProps {
+  role: UserRole;
   name: string;
   initials: string;
   unreadCount: number;
@@ -24,12 +28,15 @@ interface AdminShellProps {
 }
 
 /** Sidebar + top bar of the original admin.html. Each section is now its own route. */
-export function AdminShell({ name, initials, unreadCount, children }: AdminShellProps) {
+export function AdminShell({ role, name, initials, unreadCount, children }: AdminShellProps) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
+  // Staff is for the administrator only; Glucose is for doctors and nurses only
+  const items = NAV.filter((item) => !item.roles || item.roles.includes(role));
+
   const isActive = (href: string) => (href === "/admin" ? pathname === "/admin" : pathname.startsWith(href));
-  const title = NAV.find((item) => isActive(item.href))?.label ?? "Admin Panel";
+  const title = items.find((item) => isActive(item.href))?.label ?? "Admin Panel";
 
   return (
     <>
@@ -43,7 +50,7 @@ export function AdminShell({ name, initials, unreadCount, children }: AdminShell
         <p className="admin-label">ADMIN PANEL</p>
 
         <nav>
-          {NAV.map((item) => (
+          {items.map((item) => (
             <Link
               key={item.href}
               href={item.href}
@@ -85,7 +92,7 @@ export function AdminShell({ name, initials, unreadCount, children }: AdminShell
 
             <div>
               <strong>{name}</strong>
-              <small>System Admin</small>
+              <small>{role === "admin" ? "System Admin" : ROLES[role]}</small>
             </div>
           </div>
         </header>

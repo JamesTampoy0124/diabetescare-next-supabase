@@ -2,12 +2,14 @@ import Link from "next/link";
 import { StatCard } from "@/components/admin/StatCard";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { requireProfile } from "@/lib/auth";
+import { PANEL_ROLES } from "@/lib/roles";
+
 import { createClient } from "@/lib/supabase/server";
 import { dateBox, formatDate, formatTime, monthRange, todayInClinicTz } from "@/lib/utils/format";
 import type { Appointment, Patient } from "@/types/database";
 
 export default async function AdminDashboardPage() {
-  await requireProfile(["admin"]);
+  await requireProfile(PANEL_ROLES);
 
   const supabase = await createClient();
   const today = todayInClinicTz();
@@ -50,9 +52,9 @@ export default async function AdminDashboardPage() {
           <p>Overview of your DiabetesCare system.</p>
         </div>
 
-        <Link href="/admin/patients" className="primary-btn">
+        {/* <Link href="/admin/patients" className="primary-btn">
           + Add Patient
-        </Link>
+        </Link> */}
       </div>
 
       {/* STAT CARDS */}

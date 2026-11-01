@@ -10,6 +10,8 @@ import type { ActionState } from "@/types/actions";
 interface SettingsViewProps {
   name: string;
   email: string;
+  /** Only the administrator sees the system-wide switches. */
+  isAdmin: boolean;
   settings: { email_notifications: boolean; automatic_backups: boolean };
 }
 
@@ -51,7 +53,7 @@ function SimpleModal({
 
 type ModalName = null | "name" | "email" | "password";
 
-export function SettingsView({ name, email, settings }: SettingsViewProps) {
+export function SettingsView({ name, email, isAdmin, settings }: SettingsViewProps) {
   const [modal, setModal] = useState<ModalName>(null);
   const [values, setValues] = useState(settings);
   const [, startTransition] = useTransition();
@@ -75,16 +77,16 @@ export function SettingsView({ name, email, settings }: SettingsViewProps) {
       <div className="page-heading">
         <div>
           <h1>Settings</h1>
-          <p>Manage your administrator settings.</p>
+          <p>Manage your account settings.</p>
         </div>
       </div>
 
       <div className="panel settings-panel">
-        <h3>Administrator Account</h3>
+        <h3>My Account</h3>
 
         <div className="setting-row">
           <div>
-            <strong>Administrator Name</strong>
+            <strong>Name</strong>
             <p>{name}</p>
           </div>
 
@@ -115,6 +117,8 @@ export function SettingsView({ name, email, settings }: SettingsViewProps) {
           </button>
         </div>
 
+        {isAdmin && (
+          <>
         <h3 className="settings-title">System Settings</h3>
 
         <div className="setting-row">
@@ -148,10 +152,12 @@ export function SettingsView({ name, email, settings }: SettingsViewProps) {
             <span></span>
           </label>
         </div>
+          </>
+        )}
       </div>
 
       {modal === "name" && (
-        <SimpleModal title="Edit Administrator Name" submitLabel="Save Changes" action={updateOwnName} onClose={close}>
+        <SimpleModal title="Edit Name" submitLabel="Save Changes" action={updateOwnName} onClose={close}>
           <Field label="Full name" name="name" type="text" defaultValue={name} required maxLength={80} />
         </SimpleModal>
       )}

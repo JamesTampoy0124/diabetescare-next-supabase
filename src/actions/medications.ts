@@ -2,13 +2,13 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { getAdminOrNull } from "@/lib/auth";
+import { getActiveProfile } from "@/lib/auth";
 import { firstError, str } from "@/lib/utils/form";
 import { medicationSchema } from "@/lib/validations/records";
 import type { ActionState } from "@/types/actions";
 
 export async function createMedication(formData: FormData): Promise<ActionState> {
-  if (!(await getAdminOrNull())) return { error: "You do not have permission to do this." };
+  if (!(await getActiveProfile(["admin", "doctor"]))) return { error: "You do not have permission to do this." };
 
   const parsed = medicationSchema.safeParse({
     name: str(formData, "name"),

@@ -43,6 +43,7 @@ export interface Appointment {
   appointment_time: string; // HH:MM:SS (clinic local time)
   status: AppointmentStatus;
   notes: string;
+  meeting_link: string;
   patient: { id: string; patient_number: number; name: string } | null;
   doctor: { id: string; full_name: string } | null;
 }

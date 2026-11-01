@@ -1,0 +1,92 @@
+/* Blood glucose pages (patients, doctors, nurses). Ported from glucose.js of the original app. */
+.glucose{--g-surface:#fcfcfb;--g-ink:#0b0b0b;--g-ink2:#52514e;--g-muted:#898781;--g-grid:#e1e0d9;--g-axis:#c3c2b7;--g-blue:#2a78d6;--g-serious:#ec835a;--g-critical:#d03b3b;--g-border:rgba(11,11,11,.10);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--g-ink);margin-bottom:36px}
+.glucose *{box-sizing:border-box}
+.glucose [hidden]{display:none!important}
+.g-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:16px}
+.g-head h2{font-size:22px;margin:0 0 4px}
+.g-sub{color:var(--g-ink2);font-size:14px;margin:0}
+.g-btn{border:none;border-radius:7px;padding:10px 16px;font-size:14px;font-weight:700;cursor:pointer;background:#087f5b;color:#fff}
+.g-btn:hover{background:#066b4c}
+.g-btn.secondary{background:#f1f3f5;color:#495057}
+.g-btn.secondary:hover{background:#e9ecef}
+.g-btn.small{padding:6px 10px;font-size:12px;background:#e6fcf5;color:#087f5b}
+.g-notice{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;background:var(--g-surface);border:1px solid var(--g-border);border-left:4px solid var(--g-blue);border-radius:8px;padding:12px 14px;margin-bottom:16px;font-size:14px;line-height:1.5}
+.g-notice[hidden]{display:none}
+.g-notice.warn{border-left-color:var(--g-serious)}
+.g-notice.urgent{border-left-color:var(--g-critical)}
+.g-notice button{border:none;background:none;cursor:pointer;font-size:18px;line-height:1;color:var(--g-ink2)}
+.g-card{background:var(--g-surface);border:1px solid var(--g-border);border-radius:12px;padding:18px 20px;margin-bottom:16px}
+.g-card[hidden]{display:none}
+.g-card h3{font-size:15px;margin:0}
+.g-card-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px 20px;margin-bottom:14px}
+.g-filters{display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px 20px;margin-bottom:16px}
+.g-filters label.g-lab{display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:700;color:var(--g-ink2)}
+.g-filters select{padding:9px 10px;border:1px solid #cfd8dc;border-radius:7px;font-size:14px;background:#fff;min-width:200px}
+.g-seg{display:inline-flex;border:1px solid #cfd8dc;border-radius:7px;overflow:hidden;background:#fff}
+.g-seg button{border:none;background:none;padding:9px 13px;font-size:13px;cursor:pointer;color:var(--g-ink2);border-right:1px solid #e1e0d9}
+.g-seg button:last-child{border-right:none}
+.g-seg button:hover{background:#f4f8f7}
+.g-seg button[aria-pressed="true"]{background:#e6fcf5;color:#087f5b;font-weight:700}
+.g-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:16px}
+.g-tile{background:var(--g-surface);border:1px solid var(--g-border);border-radius:12px;padding:16px 18px}
+.g-tile-label{font-size:12px;color:var(--g-ink2);margin:0 0 6px}
+.g-tile-value{font-size:28px;font-weight:600;margin:0;line-height:1.15}
+.g-tile-value .g-unit{font-size:13px;font-weight:400;color:var(--g-ink2)}
+.g-tile-sub{font-size:12px;color:var(--g-ink2);margin:6px 0 0;min-height:16px}
+.g-flag{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--g-ink)}
+.g-ico{font-size:11px}
+.g-lvl-0 .g-ico{color:var(--g-blue)}
+.g-lvl-1 .g-ico{color:var(--g-serious)}
+.g-lvl-2 .g-ico{color:var(--g-critical)}
+.g-legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:12px;color:var(--g-ink2)}
+.g-key{display:inline-flex;align-items:center;gap:6px}
+.g-band-swatch{display:inline-block;width:16px;height:10px;background:var(--g-blue);opacity:.14;border-radius:2px}
+.g-plot{position:relative}
+.gc-svg{display:block;width:100%;height:auto;outline:none}
+.gc-svg:focus-visible{outline:2px solid var(--g-blue);outline-offset:2px;border-radius:4px}
+.gc-band{fill:var(--g-blue);opacity:.08}
+.gc-grid{stroke:var(--g-grid);stroke-width:1}
+.gc-axis{stroke:var(--g-axis);stroke-width:1}
+.gc-tick{fill:var(--g-muted);font-size:11px;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+.gc-label{fill:var(--g-ink);font-size:12px;font-weight:600;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+.gc-line{fill:none;stroke:var(--g-blue);stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+.gc-m{stroke:var(--g-surface);stroke-width:2;stroke-linejoin:round}
+.gc-m-0{fill:var(--g-blue)}
+.gc-m-1{fill:var(--g-serious)}
+.gc-m-2{fill:var(--g-critical)}
+.gc-cross{stroke:var(--g-axis);stroke-width:1}
+.gc-halo{fill:none;stroke:var(--g-ink2);stroke-width:1.5}
+.gc-hit{fill:transparent;cursor:crosshair}
+.g-tip{position:absolute;pointer-events:none;background:var(--g-surface);border:1px solid var(--g-border);box-shadow:0 6px 20px rgba(0,0,0,.12);border-radius:8px;padding:9px 12px;font-size:12px;line-height:1.5;min-width:150px;max-width:240px;z-index:5}
+.g-tip[hidden]{display:none}
+.g-tip strong{display:block;font-size:16px;font-weight:700;color:var(--g-ink)}
+.g-tip .g-tip-2{color:var(--g-ink2)}
+.g-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.g-empty{color:var(--g-ink2);font-size:14px;margin:6px 0 2px}
+.glucose .g-table-wrap{overflow-x:auto;position:relative}
+.glucose .g-table{width:100%;border-collapse:collapse;min-width:640px}
+.glucose .g-table th{font-size:11px;color:var(--g-muted);text-align:left;padding:10px 10px;border-bottom:1px solid var(--g-grid);font-weight:600}
+.glucose .g-table td{font-size:13px;padding:11px 10px;border-bottom:1px solid #edf2f2;vertical-align:top}
+.glucose .g-table td.num{font-variant-numeric:tabular-nums;font-weight:600}
+.glucose .g-table tr.g-voided td{color:var(--g-muted)}
+.glucose .g-table tr.g-voided td.num{text-decoration:line-through}
+.g-note{max-width:220px;overflow-wrap:anywhere}
+.g-more{display:block;margin:14px auto 0}
+.g-check{font-size:13px;color:var(--g-ink2);display:inline-flex;align-items:center;gap:6px}
+.g-alert-row{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px 16px;padding:11px 0;border-bottom:1px solid #edf2f2;font-size:13px}
+.g-alert-row:last-child{border-bottom:none}
+.g-alert-row small{display:block;color:var(--g-ink2);margin-top:2px}
+.g-dialog{border:none;border-radius:12px;padding:0;width:min(440px,92vw);box-shadow:0 20px 50px rgba(0,0,0,.25);font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+.g-dialog{margin:auto;max-height:90vh;overflow-y:auto}
+.g-dialog::backdrop{background:rgba(0,0,0,.4)}
+.g-dialog form{padding:22px}
+.g-dialog h3{margin:0 0 14px;font-size:17px}
+.g-field{margin-bottom:13px}
+.g-field label{display:block;font-size:12px;font-weight:700;color:#455a64;margin-bottom:5px}
+.g-field input,.g-field select,.g-field textarea{width:100%;padding:10px 11px;border:1px solid #cfd8dc;border-radius:7px;font-size:14px;font-family:inherit;background:#fff}
+.g-field-row{display:grid;grid-template-columns:1fr 130px;gap:10px}
+.g-field small{display:block;color:#78909c;font-size:11px;margin-top:4px}
+.g-for{font-size:13px;color:var(--g-ink2);margin:0 0 14px}
+.g-error{color:#c92a2a;font-size:13px;min-height:18px;margin:0 0 8px}
+.g-actions{display:flex;justify-content:flex-end;gap:10px}
+@media (max-width:600px){.g-head{flex-direction:column}.g-filters select{min-width:0;width:100%}.g-filters label.g-lab{width:100%}}
