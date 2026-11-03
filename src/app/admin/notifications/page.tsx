@@ -24,10 +24,10 @@ export default async function NotificationsPage() {
       <div className="page-heading">
         <div>
           <h1>Notifications</h1>
-          <p>System alerts and notifications.</p>
+          <p>{me.role === "doctor" ? "Reminders for your appointments." : "System alerts and notifications."}</p>
         </div>
 
-        {me.role === "admin" && <MarkAllReadButton disabled={!hasUnread} />}
+        {(me.role === "admin" || me.role === "doctor") && <MarkAllReadButton disabled={!hasUnread} />}
       </div>
 
       <div className="panel notification-panel">
