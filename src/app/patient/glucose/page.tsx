@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { GlucoseDashboard } from "@/components/glucose/GlucoseDashboard";
 import { DashboardHeader } from "@/components/layout/DashboardHeader";
 import { IdleTimeout } from "@/components/layout/IdleTimeout";
+import { ReminderRefresh } from "@/components/layout/ReminderRefresh";
 import { requireProfile } from "@/lib/auth";
 import { loadGlucoseReadings } from "@/lib/data/glucose";
 import { createClient } from "@/lib/supabase/server";
@@ -43,6 +44,8 @@ export default async function PatientGlucosePage() {
       </main>
 
       <IdleTimeout />
+      {/* new appointments and status changes made by staff appear without reloading */}
+      <ReminderRefresh everyMs={30_000} />
     </div>
   );
 }

@@ -292,6 +292,7 @@ export function PatientsView({ rows, total, page, pageSize, q, status, today, ca
     startTransition(async () => {
       const result = await setPatientArchived(patient.id, archiving);
       if (result.error) window.alert(result.error);
+      else router.refresh();
     });
   }
 

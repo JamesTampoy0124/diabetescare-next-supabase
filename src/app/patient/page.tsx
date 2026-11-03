@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { DashboardHeader } from "@/components/layout/DashboardHeader";
 import { IdleTimeout } from "@/components/layout/IdleTimeout";
+import { ReminderRefresh } from "@/components/layout/ReminderRefresh";
 import { requireProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { APPOINTMENT_STATUS_LABEL, formatPlainDate, formatTime, todayInClinicTz } from "@/lib/utils/format";
@@ -101,6 +102,8 @@ export default async function PatientPage() {
       </main>
 
       <IdleTimeout />
+      {/* new appointments and status changes made by staff appear without reloading */}
+      <ReminderRefresh everyMs={30_000} />
     </div>
   );
 }

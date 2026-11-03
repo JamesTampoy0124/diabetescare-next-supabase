@@ -85,6 +85,7 @@ export default async function AppointmentsPage({ searchParams }: { searchParams:
       pageSize={PAGE_SIZE}
       total={list.count ?? 0}
       canManage={me.role !== "nurse"}
+      doctorLocked={ownOnly}
     />
   );
 }

@@ -4,8 +4,9 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 /**
- * For doctors: refreshes the page data once a minute while the tab is open, so a new appointment reminder
- * shows up on the bell without reloading. (The server creates the reminders that are due on each refresh.)
+ * Refreshes the page data every `everyMs` while the tab is open and visible, so changes made by someone else
+ * (a new reminder, a new appointment, a status change) show up without reloading the browser.
+ * Used for doctors (reminders) and on the patient pages.
  */
 export function ReminderRefresh({ everyMs = 60_000 }: { everyMs?: number }) {
   const router = useRouter();

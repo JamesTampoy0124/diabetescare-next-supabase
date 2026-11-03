@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState, useTransition, type FormEvent } from "react";
 import type { ActionState } from "@/types/actions";
 
@@ -7,8 +8,10 @@ import type { ActionState } from "@/types/actions";
  * Runs a Server Action from a <form> without React resetting the fields afterwards,
  * so people don't lose what they typed when a validation error comes back.
  * If the action answers with `redirectTo` (login, password reset), the browser opens that page.
+ * After any other successful save the page data is refreshed, so new records show up straight away.
  */
 export function useFormSubmit<T extends ActionState>(action: (formData: FormData) => Promise<T>) {
+  const router = useRouter();
   const [state, setState] = useState<T | null>(null);
   const [navigating, setNavigating] = useState(false);
   const [pending, startTransition] = useTransition();
@@ -29,6 +32,8 @@ export function useFormSubmit<T extends ActionState>(action: (formData: FormData
             setNavigating(true); // keep the button disabled until the next page opens
             // A full page load, like pressing reload: the new login cookie is always used and nothing stale is shown.
             window.location.assign(result.redirectTo);
+          } else {
+            router.refresh(); // show the saved record in the list without reloading the browser
           }
         }
       } catch (error) {

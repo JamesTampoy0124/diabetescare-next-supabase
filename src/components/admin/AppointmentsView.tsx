@@ -40,17 +40,22 @@ interface AppointmentsViewProps {
   basePath?: string;
   /** False = view only (nurses): no "New Appointment" button and no status changes. */
   canManage?: boolean;
+  /** True for a doctor: the new appointment is assigned to them automatically. */
+  doctorLocked?: boolean;
 }
 
 function NewAppointmentModal({
   patients,
   doctors,
   today,
+  doctorLocked,
   onClose,
 }: {
   patients: Option[];
   doctors: Option[];
   today: string;
+  /** A doctor's appointments are always their own: no doctor to choose. */
+  doctorLocked: boolean;
   onClose: () => void;
 }) {
   const { state, pending, submit } = useFormSubmit(createAppointment);
@@ -66,7 +71,14 @@ function NewAppointmentModal({
       pending={pending}
     >
       <SelectField label="Patient" name="patientId" options={patients} required />
-      <SelectField label="Doctor" name="doctorId" options={doctors} required />
+      {doctorLocked && doctors[0] ? (
+        <>
+          <input type="hidden" name="doctorId" value={doctors[0].value} />
+          <Field label="Doctor" name="doctorName" type="text" value={`${doctors[0].label} (you)`} readOnly tabIndex={-1} />
+        </>
+      ) : (
+        <SelectField label="Doctor" name="doctorId" options={doctors} required />
+      )}
       <Field label="Date" name="date" type="date" required min={today} defaultValue={today} />
       <Field label="Time" name="time" type="time" required defaultValue="09:00" />
       <Field label="Notes (optional)" name="notes" type="text" maxLength={500} />
@@ -151,6 +163,7 @@ export function AppointmentsView({
   total,
   basePath = "/admin/appointments",
   canManage = true,
+  doctorLocked = false,
 }: AppointmentsViewProps) {
   const [modal, setModal] = useState<ModalState>(null);
   const close = () => setModal(null);
@@ -223,7 +236,7 @@ export function AppointmentsView({
       </div>
 
       {modal?.mode === "new" && (
-        <NewAppointmentModal patients={patients} doctors={doctors} today={today} onClose={close} />
+        <NewAppointmentModal patients={patients} doctors={doctors} today={today} doctorLocked={doctorLocked} onClose={close} />
       )}
       {modal?.mode === "view" && (
         <AppointmentDetailsModal appointment={modal.appointment} onClose={close} readOnly={!canManage} />

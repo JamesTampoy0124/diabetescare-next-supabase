@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { generateReport } from "@/actions/reports";
 import { DetailRow, SelectField } from "@/components/ui/Fields";
@@ -56,6 +57,7 @@ function ChooseReportModal({ onChoose, onClose, error, pending }: { onChoose: (t
 type ModalState = null | { mode: "choose" } | { mode: "view"; report: Report; generatedLabel: string };
 
 export function ReportsView({ recent }: { recent: ReportItem[] }) {
+  const router = useRouter();
   const [modal, setModal] = useState<ModalState>(null);
   const [error, setError] = useState<string | undefined>();
   const [pending, startTransition] = useTransition();
@@ -73,6 +75,7 @@ export function ReportsView({ recent }: { recent: ReportItem[] }) {
       }
 
       setModal({ mode: "view", report: result.report, generatedLabel: "Just now" });
+      router.refresh(); // add it to "Recent Reports" right away
     });
   }
 
